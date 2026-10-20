@@ -4,10 +4,12 @@ import { requireOptionalNativeModule } from 'expo-modules-core';
 const NativeNavModule: any = requireOptionalNativeModule('ExpoNavigationBar');
 
 /**
- * Sets the navigation bar button style ('dark' = light icons for dark backgrounds).
+ * Sets the navigation bar button style ('light' = light buttons for dark backgrounds).
+ * In Android / Expo, style 'light' instructs the system that the bar has dark background
+ * and needs light buttons.
  * Gracefully no-ops if ExpoNavigationBar native module is not present in the current build.
  */
-export function setSystemNavBarStyle(style: 'dark' | 'light' = 'dark'): void {
+export function setSystemNavBarStyle(style: 'light' | 'dark' = 'light'): void {
   if (NativeNavModule?.setStyle) {
     try {
       NativeNavModule.setStyle(style);

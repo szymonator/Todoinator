@@ -5,14 +5,9 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": true
-    },
-    "androidNavigationBar": {
-      "visible": "sticky-immersive",
-      "barStyle": "light-content",
-      "backgroundColor": "#121316"
     },
     "plugins": [
       "@react-native-community/datetimepicker",
@@ -24,9 +19,10 @@
         }
       ],
       [
-        "expo-calendar",
+        "expo-navigation-bar",
         {
-          "calendarPermission": "Allow Todoinator to read your calendar to identify 1-hour focus gaps for high-urgency tasks."
+          "style": "light",
+          "hidden": false
         }
       ]
     ],
@@ -42,9 +38,7 @@
       "permissions": [
         "android.permission.RECEIVE_BOOT_COMPLETED",
         "android.permission.SCHEDULE_EXACT_ALARM",
-        "android.permission.POST_NOTIFICATIONS",
-        "android.permission.READ_CALENDAR",
-        "android.permission.WRITE_CALENDAR"
+        "android.permission.POST_NOTIFICATIONS"
       ]
     },
     "extra": {

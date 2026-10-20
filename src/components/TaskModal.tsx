@@ -139,7 +139,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
-        <View style={[styles.modalContent, { paddingBottom: Math.max(insets.bottom, 16) }]}>
+        <View style={[styles.modalContent, { paddingBottom: Math.max(insets.bottom, 16) + 16 }]}>
           {/* Header */}
           <View style={styles.headerRow}>
             <Text style={styles.modalTitle}>
@@ -418,11 +418,13 @@ const styles = StyleSheet.create({
     maxHeight: 520,
   },
   formContainer: {
-    padding: 20,
-    gap: 18,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 28,
+    gap: 20,
   },
   fieldGroup: {
-    gap: 8,
+    gap: 10,
   },
   fieldLabel: {
     fontSize: 13,
@@ -560,15 +562,16 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   candidateList: {
-    gap: 6,
+    gap: 8,
   },
   candidateItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
     backgroundColor: colors.surfaceCard,
-    padding: 10,
-    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 12,
     borderCurve: 'continuous',
     borderWidth: 1,
     borderColor: colors.outlineVariant,
@@ -581,7 +584,7 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   candidateTitle: {
-    fontSize: 13,
+    fontSize: 14,
     color: colors.textPrimary,
   },
   candidateTitleSelected: {
@@ -605,36 +608,37 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     paddingHorizontal: 20,
-    paddingTop: 14,
+    paddingTop: 16,
+    paddingBottom: 16,
     borderTopWidth: 1,
     borderTopColor: colors.outlineVariant,
   },
   cancelButton: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingVertical: 15,
+    borderRadius: 14,
     borderCurve: 'continuous',
     backgroundColor: colors.surfaceCard,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelButtonText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
     color: colors.textSecondary,
   },
   saveButton: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingVertical: 15,
+    borderRadius: 14,
     borderCurve: 'continuous',
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   saveButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '700',
     color: '#FFFFFF',
   },
 });

@@ -18,13 +18,10 @@ import {
   initializeNotifications,
   buildMorningBriefingText,
 } from '../services/notifications';
-import { requestCalendarPermissions, findTodayGaps } from '../services/calendar';
 
 interface DiagnosticsModalProps {
   visible: boolean;
   tasks: Task[];
-  isDemoMode: boolean;
-  onToggleDemoMode: () => void;
   isNavCollapsed?: boolean;
   onToggleNavCollapsed?: () => void;
   onResetSeedTasks: () => void;
@@ -34,15 +31,12 @@ interface DiagnosticsModalProps {
 export const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({
   visible,
   tasks,
-  isDemoMode,
-  onToggleDemoMode,
   isNavCollapsed = false,
   onToggleNavCollapsed,
   onResetSeedTasks,
   onClose,
 }) => {
   const [briefingStatus, setBriefingStatus] = useState<string | null>(null);
-  const [calendarStatus, setCalendarStatus] = useState<string | null>(null);
 
   const briefing = buildMorningBriefingText(tasks);
 
@@ -75,19 +69,6 @@ export const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({
     );
   };
 
-  const handleRequestCalendarPermission = async () => {
-    const { granted } = await requestCalendarPermissions();
-    setCalendarStatus(granted ? '✅ Calendar permission granted!' : '⚠️ Permission not granted.');
-    if (granted) {
-      const gaps = await findTodayGaps(60, false);
-      Alert.alert(
-        'Calendar Connected',
-        `Found ${gaps.length} free 1-hour windows in today's device calendar.`,
-        [{ text: 'OK' }]
-      );
-    }
-  };
-
   const insets = useSafeAreaInsets();
 
   return (
@@ -98,7 +79,7 @@ export const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
-        <View style={[styles.modalContent, { paddingBottom: Math.max(insets.bottom, 16) }]}>
+        <View style={[styles.modalContent, { paddingBottom: Math.max(insets.bottom, 16) + 24 }]}>
           {/* Header */}
           <View style={styles.headerRow}>
             <View style={styles.headerTitleGroup}>
@@ -160,47 +141,7 @@ export const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({
               ) : null}
             </View>
 
-            {/* Section 2: Calendar Awareness */}
-            <View style={styles.sectionCard}>
-              <View style={styles.sectionTitleRow}>
-                <MaterialCommunityIcons name="calendar" size={18} color={colors.secondary} />
-                <Text style={styles.sectionTitle}>Native Calendar Engine</Text>
-              </View>
-
-              <Text style={styles.descriptionText}>
-                Reads device calendars to discover 1-hour free gaps today and recommend the top Do Now task.
-              </Text>
-
-              <View style={styles.actionButtonGroup}>
-                <Pressable
-                  style={[styles.actionBtn, isDemoMode ? styles.actionBtnActive : null]}
-                  onPress={onToggleDemoMode}
-                >
-                  <MaterialCommunityIcons
-                    name={isDemoMode ? 'toggle-switch' : 'toggle-switch-off-outline'}
-                    size={20}
-                    color={isDemoMode ? colors.secondary : colors.textTertiary}
-                  />
-                  <Text style={styles.actionBtnText}>
-                    {isDemoMode ? 'Using Mock Calendar Events' : 'Using Native Device Calendar'}
-                  </Text>
-                </Pressable>
-
-                <Pressable
-                  style={styles.actionBtn}
-                  onPress={handleRequestCalendarPermission}
-                >
-                  <MaterialCommunityIcons name="account-search-outline" size={16} color={colors.secondary} />
-                  <Text style={styles.actionBtnText}>Request Native Calendar Access</Text>
-                </Pressable>
-              </View>
-
-              {calendarStatus ? (
-                <Text style={styles.statusFeedbackText}>{calendarStatus}</Text>
-              ) : null}
-            </View>
-
-            {/* Section 3: Sample Data Reset */}
+            {/* Section 2: Sample Data Reset */}
             <View style={styles.sectionCard}>
               <View style={styles.sectionTitleRow}>
                 <MaterialCommunityIcons name="database-refresh" size={18} color={colors.success} />
@@ -296,7 +237,8 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     padding: 20,
-    gap: 16,
+    paddingBottom: 36,
+    gap: 18,
   },
   sectionCard: {
     backgroundColor: colors.surfaceCard,
@@ -304,8 +246,8 @@ const styles = StyleSheet.create({
     borderCurve: 'continuous',
     borderWidth: 1,
     borderColor: colors.outlineVariant,
-    padding: 14,
-    gap: 10,
+    padding: 16,
+    gap: 12,
   },
   sectionTitleRow: {
     flexDirection: 'row',

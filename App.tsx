@@ -11,7 +11,7 @@ import {
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { setSystemNavBarStyle, setSystemNavBarHidden } from './src/utils/navigationBar';
-import { Task, TaskUrgencyInfo, SuggestedAction } from './src/types/task';
+import { Task, TaskUrgencyInfo } from './src/types/task';
 import { colors } from './src/theme/colors';
 import { sortTasksByTrueUrgency } from './src/utils/urgency';
 import { loadTasks, saveTasks, resetToSampleTasks } from './src/services/storage';
@@ -19,9 +19,7 @@ import {
   initializeNotifications,
   syncAllNotifications,
 } from './src/services/notifications';
-import { getSuggestedAction } from './src/services/calendar';
 import { TaskItem } from './src/components/TaskItem';
-import { SuggestedActionCard } from './src/components/SuggestedActionCard';
 import { FilterBar, FilterType } from './src/components/FilterBar';
 import { TaskModal } from './src/components/TaskModal';
 import { DiagnosticsModal } from './src/components/DiagnosticsModal';
@@ -39,8 +37,6 @@ function TodoinatorMain() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [tickerTime, setTickerTime] = useState<Date>(new Date());
   const [activeFilter, setActiveFilter] = useState<FilterType>('doNow');
-  const [suggestedAction, setSuggestedAction] = useState<SuggestedAction | null>(null);
-  const [isDemoCalendar, setIsDemoCalendar] = useState<boolean>(true);
   const [isNavCollapsed, setIsNavCollapsed] = useState<boolean>(false);
 
   // Modal states
@@ -57,7 +53,7 @@ function TodoinatorMain() {
       await syncAllNotifications(loaded);
     }
     init();
-    setSystemNavBarStyle('dark');
+    setSystemNavBarStyle('light');
   }, []);
 
   // System bar collapse/expand effect
@@ -74,18 +70,6 @@ function TodoinatorMain() {
     return () => clearInterval(interval);
   }, []);
 
-  // Update suggested action whenever tasks or tickerTime change
-  useEffect(() => {
-    async function updateSuggestedAction() {
-      if (tasks.length === 0) {
-        setSuggestedAction(null);
-        return;
-      }
-      const suggestion = await getSuggestedAction(tasks, isDemoCalendar, tickerTime);
-      setSuggestedAction(suggestion);
-    }
-    updateSuggestedAction();
-  }, [tasks, isDemoCalendar, tickerTime]);
 
   // Evaluated and sorted tasks by True Urgency
   const { all, doNow, blocked, completed } = useMemo(() => {
@@ -283,15 +267,6 @@ function TodoinatorMain() {
           renderItem={renderItem}
           ListHeaderComponent={
             <View style={styles.listHeader}>
-              {/* Suggested Action Card */}
-              <SuggestedActionCard
-                suggestion={suggestedAction}
-                isDemoMode={isDemoCalendar}
-                onToggleDemoMode={() => setIsDemoCalendar(!isDemoCalendar)}
-                onCompleteTask={handleToggleComplete}
-                onOpenTask={handleOpenEdit}
-              />
-
               {/* Filter Bar */}
               <FilterBar
                 activeFilter={activeFilter}
@@ -326,7 +301,7 @@ function TodoinatorMain() {
           }
           contentContainerStyle={[
             styles.listContent,
-            { paddingBottom: isNavCollapsed ? 80 : insets.bottom + 80 },
+            { paddingBottom: isNavCollapsed ? 90 : Math.max(insets.bottom, 16) + 90 },
           ]}
           showsVerticalScrollIndicator={false}
         />
@@ -336,7 +311,7 @@ function TodoinatorMain() {
       <Pressable
         style={[
           styles.fab,
-          { bottom: isNavCollapsed ? 20 : insets.bottom + 20 },
+          { bottom: isNavCollapsed ? 28 : Math.max(insets.bottom, 16) + 24 },
         ]}
         onPress={() => {
           setEditingTask(null);
@@ -359,8 +334,6 @@ function TodoinatorMain() {
       <DiagnosticsModal
         visible={isDiagnosticsVisible}
         tasks={tasks}
-        isDemoMode={isDemoCalendar}
-        onToggleDemoMode={() => setIsDemoCalendar(!isDemoCalendar)}
         isNavCollapsed={isNavCollapsed}
         onToggleNavCollapsed={() => setIsNavCollapsed((prev) => !prev)}
         onResetSeedTasks={handleResetToSeeds}

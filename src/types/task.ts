@@ -40,16 +40,3 @@ export interface TaskUrgencyInfo {
   blockedTaskNames: string[];
   tier: UrgencyTier;
 }
-
-export interface CalendarGap {
-  id: string;
-  start: Date;
-  end: Date;
-  durationMinutes: number;
-  formattedTime: string;
-}
-
-export interface SuggestedAction {
-  gap: CalendarGap;
-  task: TaskUrgencyInfo;
-}
