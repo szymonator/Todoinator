@@ -39,4 +39,8 @@ export interface TaskUrgencyInfo {
   blockingTaskNames: string[];
   blockedTaskNames: string[];
   tier: UrgencyTier;
+  effectiveDeadline: string | null;
+  effectivePriority: PriorityLevel;
+  isInheritedDeadline: boolean;
+  isInheritedScore: boolean;
 }

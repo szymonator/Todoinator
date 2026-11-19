@@ -18,7 +18,19 @@ export const TaskItem: React.FC<TaskItemProps> = React.memo(({
   onPress,
   onDelete,
 }) => {
-  const { task, score, hoursRemaining, isBlocked, blockingTaskNames, blockedTaskNames, tier } = info;
+  const {
+    task,
+    score,
+    hoursRemaining,
+    isBlocked,
+    blockingTaskNames,
+    blockedTaskNames,
+    tier,
+    effectiveDeadline,
+    effectivePriority,
+    isInheritedDeadline,
+    isInheritedScore,
+  } = info;
   const priorityMeta = PRIORITY_MAP[task.basePriority];
 
   const getUrgencyBadgeStyle = () => {
@@ -110,7 +122,7 @@ export const TaskItem: React.FC<TaskItemProps> = React.memo(({
                   color={urgencyStyle.text}
                 />
                 <Text style={[styles.badgeText, { color: urgencyStyle.text }]}>
-                  Score: {score}
+                  Score: {score}{isInheritedScore ? ' ↑' : ''}
                 </Text>
               </View>
             ) : null}
@@ -119,15 +131,16 @@ export const TaskItem: React.FC<TaskItemProps> = React.memo(({
             <View style={[styles.badge, { backgroundColor: priorityMeta.badgeBg }]}>
               <Text style={[styles.badgeText, { color: priorityMeta.color }]}>
                 P{priorityMeta.level} {priorityMeta.label}
+                {!task.completed && effectivePriority > task.basePriority ? ` (↑P${effectivePriority})` : ''}
               </Text>
             </View>
 
-            {/* Deadline Countdown */}
-            {!task.completed && task.deadline ? (
+            {/* Deadline Countdown (explicit or inherited from blocked task) */}
+            {!task.completed && effectiveDeadline ? (
               <View style={[styles.badge, styles.badgeNeutral]}>
                 <MaterialCommunityIcons name="clock-outline" size={12} color={colors.textSecondary} />
                 <Text style={styles.badgeTextNeutral}>
-                  {formatHoursRemaining(hoursRemaining)}
+                  {formatHoursRemaining(hoursRemaining)}{isInheritedDeadline ? ' (auto)' : ''}
                 </Text>
               </View>
             ) : null}

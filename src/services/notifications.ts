@@ -1,7 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import { Task } from '../types/task';
-import { sortTasksByTrueUrgency } from '../utils/urgency';
+import { sortTasksByTrueUrgency, evaluateAllTasksUrgency } from '../utils/urgency';
 
 // Configure foreground notification behavior
 Notifications.setNotificationHandler({
@@ -141,14 +141,18 @@ export async function triggerTestMorningBriefing(tasks: Task[]): Promise<string 
 }
 
 /**
- * Schedules an alert exactly 60 minutes before a task's hard deadline.
+ * Schedules an alert exactly 60 minutes before a task's effective deadline
+ * (explicit deadline or inherited buffer deadline from blocked tasks).
  */
-export async function schedulePreDeadlineAlert(task: Task): Promise<string | null> {
-  if (!task.deadline || task.completed) {
+export async function schedulePreDeadlineAlert(
+  task: Task,
+  effectiveDeadline: string | null = task.deadline
+): Promise<string | null> {
+  if (!effectiveDeadline || task.completed) {
     return null;
   }
 
-  const deadlineMs = new Date(task.deadline).getTime();
+  const deadlineMs = new Date(effectiveDeadline).getTime();
   const alertMs = deadlineMs - 60 * 60 * 1000; // 60 minutes prior
   const nowMs = Date.now();
 
@@ -213,11 +217,12 @@ export async function cancelMorningBriefing(): Promise<void> {
 export async function syncAllNotifications(tasks: Task[]): Promise<void> {
   await scheduleDailyMorningBriefing(tasks);
 
-  for (const task of tasks) {
-    if (task.completed || !task.deadline) {
-      await cancelTaskNotification(task.id);
+  const evaluated = evaluateAllTasksUrgency(tasks, new Date());
+  for (const info of evaluated) {
+    if (info.task.completed || !info.effectiveDeadline) {
+      await cancelTaskNotification(info.task.id);
     } else {
-      await schedulePreDeadlineAlert(task);
+      await schedulePreDeadlineAlert(info.task, info.effectiveDeadline);
     }
   }
 }
